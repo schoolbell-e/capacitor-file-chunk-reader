@@ -1,0 +1,80 @@
+{
+  "api": {
+    "name": "FileChunkReaderPlugin",
+    "slug": "filechunkreaderplugin",
+    "docs": "",
+    "tags": [],
+    "methods": [
+      {
+        "name": "readFileChunk",
+        "signature": "(params: ReadFileChunkParams) => Promise<{ data: string; }>",
+        "parameters": [
+          {
+            "name": "params",
+            "docs": "",
+            "type": "ReadFileChunkParams"
+          }
+        ],
+        "returns": "Promise<{ data: string; }>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "ReadFileChunkParams"
+        ],
+        "slug": "readfilechunk"
+      },
+      {
+        "name": "readFileSize",
+        "signature": "(params: { path: string; }) => Promise<{ size: number; }>",
+        "parameters": [
+          {
+            "name": "params",
+            "docs": "",
+            "type": "{ path: string; }"
+          }
+        ],
+        "returns": "Promise<{ size: number; }>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [],
+        "slug": "readfilesize"
+      }
+    ],
+    "properties": []
+  },
+  "interfaces": [
+    {
+      "name": "ReadFileChunkParams",
+      "slug": "readfilechunkparams",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "path",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "start",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "end",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typeAliases": [],
+  "pluginConfigs": []
+}
