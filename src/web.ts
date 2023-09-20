@@ -6,8 +6,10 @@ export class FileChunkReaderWeb
   extends WebPlugin
   implements FileChunkReaderPlugin
 {
-  async echo(options: { value: string }): Promise<{ value: string }> {
-    console.log('ECHO', options);
-    return options;
+  async readFileChunk(_:any): Promise<any> {
+    throw this.unavailable("Not implemented on web.");
   }
+  async readFileSize(_:any): Promise<any> {
+    throw this.unavailable("Not implemented on web.");
+  }  
 }

@@ -11,7 +11,10 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
-
+import java.io.RandomAccessFile;
+import java.io.IOException;
+import android.content.ContentResolver;
+import java.io.File;
 @CapacitorPlugin(name = "FileChunkReader")
 public class FileChunkReaderPlugin extends Plugin {
 
@@ -19,39 +22,42 @@ public class FileChunkReaderPlugin extends Plugin {
 
     @PluginMethod
     public void readFileChunk(PluginCall call) {
-        String tPath = call.getString("path");
-        Integer tOffset = call.getInt("offset", 0);
-        Integer tLength = call.getInt("length", 0);
-        JSObject tResponse = new JSObject();
+        String path = call.getString("path");
+        Integer start = call.getInt("start", 0);
+        Integer end = call.getInt("end", 0);
+        Integer length = end - start + 1;
 
 
-        Uri uri = Uri.parse(tPath);
-        if (uri.getScheme() == null || u.getScheme().equals("file")) {
-            byte[] tBuffer = new byte[tLength];
-            try (RandomAccessFile tRandomAccessFile = new RandomAccessFile(tPath, "r")) {
-                tRandomAccessFile.seek(tOffset); // MOVE TO OFFSET
-                tRandomAccessFile.read(tBuffer, 0, tLength);
-                tResponse.put("data",android.util.Base64.encodeToString(tBuffer, android.util.Base64.NO_WRAP));
-                call.resolve(tResponse);
+
+        Uri uri = Uri.parse(path);
+        if (uri.getScheme() == null || uri.getScheme().equals("file")) {
+            byte[] tBuffer = new byte[length];
+            try (RandomAccessFile tRandomAccessFile = new RandomAccessFile(path, "r")) {
+                tRandomAccessFile.seek(start); // MOVE TO OFFSET
+                tRandomAccessFile.read(tBuffer, 0, length);
+
+                JSObject response = new JSObject();
+                response.put("data",android.util.Base64.encodeToString(tBuffer, android.util.Base64.NO_WRAP));
+                call.resolve(response);
             } catch (IOException e) {
-                call.reject(e.toLocalizedMessage());
+                call.reject(e.getLocalizedMessage());
             }
         }   
-        else if (u.getScheme().equals("file")) {
-            ContentResolver contentResolver = getContentResolver(); // Replace with your context or activity
+        else if (uri.getScheme().equals("content")) {
+            ContentResolver contentResolver = getContext().getContentResolver(); // Replace with your context or activity
 
-            Uri contentUri = Uri.parse("content://your_content_provider/your_resource");
             String[] projection = {MediaStore.Images.Media.DATA}; // Replace with your desired columns
-            Cursor cursor = contentResolver.query(contentUri, projection, null, null, null);
+            Cursor cursor = contentResolver.query(uri, projection, null, null, null);
             
-            String data;
+            String data = "";
             if (cursor != null) {
-                if (cursor.moveToPosition(startIndex)) {
+                if (cursor.moveToPosition(start)) {
                     // Loop through the range
-                    for (int i = startIndex; i <= endIndex; i++) {
+                    for (int i = start; i <= end; i++) {
                         // Read data from the cursor
-                        data += cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
-            
+                        String dataBit = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
+                        data += dataBit;
+
                         // Move to the next position
                         if (!cursor.moveToNext()) {
                             break; // End of the range
@@ -59,13 +65,15 @@ public class FileChunkReaderPlugin extends Plugin {
                     }
                 }
                 cursor.close(); // Close the cursor when done
-                if (data == null) {
+                if (data == "") {
                     call.reject("data is null");
                 }
                 else {
                     byte[] encodedBytes = Base64.getEncoder().encode(data.getBytes());
-                    tResponse.put("data",new String(encodedBytes));
-                    call.resolve(tResponse);
+                    String base64EncodedString = new String(encodedBytes);
+                    JSObject response = new JSObject();
+                    response.put("data",base64EncodedString);
+                    call.resolve(response);
                 }
 
             }    
@@ -80,23 +88,23 @@ public class FileChunkReaderPlugin extends Plugin {
     @PluginMethod
     public void readFileSize (PluginCall call) {
 
-        String tPath = call.getString("path");
+        String path = call.getString("path");
             Uri uri = Uri.parse(path);
             if (uri.getScheme() == null || uri.getScheme().equals("file")) {
                 File fileObject = new File(uri.getPath());
             }
-            else if (u.getScheme().equals("conent")) {
+            else if (uri.getScheme().equals("content")) {
 
-                ContentResolver contentResolver = getContentResolver(); // Replace with your context or activity
+                ContentResolver contentResolver = getContext().getContentResolver(); // Replace with your context or activity
         
                 // Define the columns you want to retrieve
                 String[] projection = {
                     MediaStore.Files.FileColumns.SIZE, // File size in bytes
                 };
         
-                Cursor cursor = contentResolver.query(contentUri, projection, null, null, null);
+                Cursor cursor = contentResolver.query(uri, projection, null, null, null);
         
-                Long fileSize;
+                long fileSize = 0;
                 if (cursor != null) { 
                     if (cursor.moveToFirst()) {
                     int sizeIndex = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE);
@@ -105,12 +113,13 @@ public class FileChunkReaderPlugin extends Plugin {
                     }
                     cursor.close(); // Close the cursor when done
 
-                    if (fileSize == null) {
+                    if (fileSize == 0) {
                         call.reject("fileSize is null.");
                     }
                     else {
-                        tResponse.put("data",fileSize);
-                        call.resolve(tResponse);
+                        JSObject response = new JSObject();
+                        response.put("size",fileSize);
+                        call.resolve(response);
                     }
                 }        
                 else {

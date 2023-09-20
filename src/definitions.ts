@@ -1,3 +1,10 @@
+export interface ReadFileChunkParams {
+  path: string;
+  start:number;
+  end:number;
+}
+
 export interface FileChunkReaderPlugin {
-  echo(options: { value: string }): Promise<{ value: string }>;
+  readFileChunk(params: ReadFileChunkParams): Promise<{data:string}>;  
+  readFileSize (params: { path: string }): Promise<{size:number}>;
 }

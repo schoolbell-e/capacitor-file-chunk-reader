@@ -13,25 +13,54 @@ npx cap sync
 
 <docgen-index>
 
-* [`echo(...)`](#echo)
+* [`readFileChunk(...)`](#readfilechunk)
+* [`readFileSize(...)`](#readfilesize)
+* [Interfaces](#interfaces)
 
 </docgen-index>
 
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### echo(...)
+### readFileChunk(...)
 
 ```typescript
-echo(options: { value: string; }) => Promise<{ value: string; }>
+readFileChunk(params: ReadFileChunkParams) => Promise<{ data: string; }>
 ```
 
-| Param         | Type                            |
-| ------------- | ------------------------------- |
-| **`options`** | <code>{ value: string; }</code> |
+| Param        | Type                                                                |
+| ------------ | ------------------------------------------------------------------- |
+| **`params`** | <code><a href="#readfilechunkparams">ReadFileChunkParams</a></code> |
 
-**Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
+**Returns:** <code>Promise&lt;{ data: string; }&gt;</code>
 
 --------------------
+
+
+### readFileSize(...)
+
+```typescript
+readFileSize(params: { path: string; }) => Promise<{ size: number; }>
+```
+
+| Param        | Type                           |
+| ------------ | ------------------------------ |
+| **`params`** | <code>{ path: string; }</code> |
+
+**Returns:** <code>Promise&lt;{ size: number; }&gt;</code>
+
+--------------------
+
+
+### Interfaces
+
+
+#### ReadFileChunkParams
+
+| Prop        | Type                |
+| ----------- | ------------------- |
+| **`path`**  | <code>string</code> |
+| **`start`** | <code>number</code> |
+| **`end`**   | <code>number</code> |
 
 </docgen-api>
