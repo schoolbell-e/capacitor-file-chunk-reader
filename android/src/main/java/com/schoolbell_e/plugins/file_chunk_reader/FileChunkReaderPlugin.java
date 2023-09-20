@@ -5,7 +5,12 @@ import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+
 import java.util.Base64; 
+import android.content.ContentResolver;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
 
 @CapacitorPlugin(name = "FileChunkReader")
 public class FileChunkReaderPlugin extends Plugin {
