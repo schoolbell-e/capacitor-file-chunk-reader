@@ -16,39 +16,44 @@ public class FileChunkReaderPlugin: CAPPlugin {
         let end = UInt64(call.getInt("end", 0))
         let length = Int(end - start + 1)
         
+        guard let fileURL = URL(string: path) else {
+            call.reject("Invalid path.")
+            return;
+        }
         // GET THE FILE HANDLE AND READ THE CHUNK
-        guard let fileHandle = FileHandle(forReadingAtPath: path) else {
+        guard let fileHandle = FileHandle(forReadingAtPath: fileURL.path) else {
             call.reject("Unable to open file")
             return;
         }
         defer {
             fileHandle.closeFile()
         }
+        
         fileHandle.seek(toFileOffset: start)
-        var data = fileHandle.readData(ofLength: length)
-        fileHandle.closeFile()
+        let data = fileHandle.readData(ofLength: length)
         call.resolve(["data":data.base64EncodedString()])
+        
     }
 
-     @objc func readFileSize(_ call: CAPPluginCall) {
-         let path = call.getString("path", "");
-         // Use if let to safely unwrap the optional and avoid potential issues
-         if let fileUrlPath = URL(string: path)?.path {
-             do {
-                 let attr = try FileManager.default.attributesOfItem(atPath: fileUrlPath)
-                 if let size = attr[.size] as? UInt64 {
-                     call.resolve(["size": size])
-                     return // Add return statement to exit the function after resolving
-                 }
-             } catch {
-                 // Handle any potential errors from FileManager or attribute retrieval
-                 call.reject("Error getting file size: \(error.localizedDescription)")
-             }
-         }
-         
-         // If the above code doesn't succeed, reject the call
-         call.reject("Unable to get file size")
-     }
+    @objc func readFileSize(_ call: CAPPluginCall) {
+        let path = call.getString("path", "");
+        // Use if let to safely unwrap the optional and avoid potential issues
+        if let fileUrlPath = URL(string: path)?.path {
+            do {
+                let attr = try FileManager.default.attributesOfItem(atPath: fileUrlPath)
+                if let size = attr[.size] as? UInt64 {
+                    call.resolve(["size": size])
+                    return // Add return statement to exit the function after resolving
+                }
+            } catch {
+                // Handle any potential errors from FileManager or attribute retrieval
+                call.reject("Error getting file size: \(error.localizedDescription)")
+            }
+        }
+        
+        // If the above code doesn't succeed, reject the call
+        call.reject("Unable to get file size")
+    }
 
 
         
